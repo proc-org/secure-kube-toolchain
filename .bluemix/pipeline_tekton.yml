@@ -21,6 +21,10 @@ inputs:
     branch: master
     path: toolchain
   - type: git
+    branch: main
+    service: ${TEKTON_GITSECURE}
+    path: gitsecure
+  - type: git
     service: ${TEKTON_CATALOG_REPO}
     branch: master
     path: devops-insights
@@ -78,3 +82,5 @@ properties:
   - name: dev-resource-group
     value: ${PROD_RESOURCE_GROUP}
     type: text
+  - name: artifactory-dockerconfigjson
+    type: SECURE

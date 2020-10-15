@@ -47,6 +47,9 @@ spec:
     - name: dev-resource-group
     - name: dev-cluster-namespace
       description: namespace dev
+    - name: artifactory-dockerconfigjson
+      description: dockerconfigjson for pullsecrets
+    - name: apikey
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -59,6 +62,19 @@ spec:
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
+    - apiVersion: v1
+      kind: Secret
+      data:
+        .dockerconfigjson: $(params.artifactory-dockerconfigjson)
+      metadata:
+        name: artifactory-pull-secret
+      type: kubernetes.io/dockerconfigjson
+    - apiVersion: v1
+      kind: ServiceAccount
+      imagePullSecrets:
+        - name: artifactory-pull-secret
+      metadata:
+        name: sa-pullsecret
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -105,10 +121,13 @@ spec:
             value: $(params.dev-cluster-namespace)
           - name: pipeline-debug
             value: $(params.pipeline-debug)
+          - name: apikey
+            value: $(params.apikey)
         workspaces:
           - name: pipeline-ws
             persistentVolumeClaim:
               claimName: secure-kube-$(uid)-pvc
+        serviceAccountName: sa-pullsecret
 ---
 apiVersion: tekton.dev/v1beta1
 kind: TriggerBinding

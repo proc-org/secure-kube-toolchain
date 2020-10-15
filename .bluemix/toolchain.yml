@@ -12,6 +12,8 @@ template:
   required:
     - build
     - repo
+    - tekton-catalog-repo
+    - tekton-gitsecure
   $configuration:
      ENABLE_EXTENSIONS: true
      ENABLE_IF_ELSE: true
@@ -54,6 +56,7 @@ services:
       type: "link"
       has_issues: false
       enable_traceability: false
+      legal: true
       kind: ['pipeline']
   tekton-catalog-repo:
     service_id: >
@@ -65,11 +68,57 @@ services:
       has_issues: false
       enable_traceability: false
       kind: ['pipeline']
+  tekton-gitsecure:
+    service_id: github_integrated
+    parameters:
+      repo_name: 'gitsecure-tekton-pipeline'
+      repo_url: >
+        $env.type === 'link' ?
+          $env.app_repo : 'https://github.ibm.com/oneibmcloud/gitsecure-tekton-pipeline'
+      source_repo_url: >
+        $env.type === 'fork' || $env.type === 'clone' ?
+          $env.app_repo : 'https://github.ibm.com/oneibmcloud/gitsecure-tekton-pipeline'
+      type: $env.type || 'link'
+      has_issues: false
+      enable_traceability: false
+      legal: true
+      kind: ['pipeline']
+  pr:
+    service_id: pipeline
+    parameters:
+      services:
+        - repo
+        - tekton-catalog-repo
+        - tekton-gitsecure
+      name: 'pr-pipeline'
+      type: >
+        $env.pipeline_type === 'tekton' ? 'tekton': 'classic'
+      ui-pipeline: true
+      configuration:
+        content:
+          $text: >
+            $env.pipeline_type === 'tekton' ? 'pr_pipeline_tekton.yml' : 'pipeline.yml'
+        env:
+          PIPELINE_REPO: pipeline-repo
+          APP_REPO: repo
+          API_KEY: '{{form.pipeline.parameters.api-key}}'
+          APP_NAME: "{{form.pipeline.parameters.app-name}}"
+          TEKTON_GITSECURE: tekton-gitsecure
+          ARTIFACTORY_DOCKER_CONFIG_JSON: '{{form.artifactoryComp.parameters.docker_config_json}}'
+          PRIVATE_WORKER: '{{services.privateWorker.parameters.name}}'
+          PIPELINE_REPO_BRANCH: >
+            $env.branch ? $env.branch : "master"
+          TEKTON_CATALOG_REPO: tekton-catalog-repo
+          REGISTRY_REGION_ID: "{{form.pipeline.parameters.registry-region}}"
+          REGISTRY_NAMESPACE: "{{form.pipeline.parameters.registry-namespace}}"
+        execute: false
   build:
     service_id: pipeline
     parameters:
       services:
         - repo
+        - tekton-catalog-repo
+        - tekton-gitsecure
       name: "{{services.repo.parameters.repo_name}}"
       ui-pipeline: true
       type: >
@@ -106,6 +155,7 @@ services:
           PIPELINE_REPO_BRANCH: >
             $env.branch ? $env.branch : "master"
           TEKTON_CATALOG_REPO: tekton-catalog-repo
+          TEKTON_GITSECURE: tekton-gitsecure
           GIT_COMMIT_EVENT_LISTENER_NAME: >
             if ( $env.source_provider === 'githubconsolidated' ) {
               'github-commit';
@@ -120,6 +170,8 @@ services:
             }
         execute: >
           $env.pipeline_type === 'tekton' ? false : true
+  devops-insights:
+    service_id: draservicebroker
   webide:
     service_id: orion
 form:
