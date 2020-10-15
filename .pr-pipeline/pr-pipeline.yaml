@@ -72,11 +72,11 @@ spec:
       workspaces:
         - name: artifacts
           workspace: pipeline-ws
-    - name: gitsecure-discovery-scan
+    - name: cra-discovery-scan
       runAfter:
         - git-clone
       taskRef:
-        name: gitsecure-discovery
+        name: cra-discovery
       workspaces:
         - name: artifacts
           workspace: pipeline-ws
@@ -118,9 +118,9 @@ spec:
           value: $(tasks.extract-repository-url.results.extracted-value)
     - name: code-vulnerability-scan
       runAfter:
-        - gitsecure-discovery-scan
+        - cra-discovery-scan
       taskRef:
-        name: gitsecure-vulnerability-remediation
+        name: cra-vulnerability-remediation
       workspaces:
         - name: artifacts
           workspace: pipeline-ws
@@ -179,11 +179,11 @@ spec:
           value: "CIS scan"
         - name: repository
           value: $(tasks.extract-repository-url.results.extracted-value)
-    - name: gitsecure-cis-check
+    - name: cra-cis-check
       taskRef:
-        name: gitsecure-cis-check
+        name: cra-cis-check
       runAfter:
-        - gitsecure-discovery-scan
+        - cra-discovery-scan
       workspaces:
         - name: secrets
           workspace: pipeline-ws
@@ -208,7 +208,7 @@ spec:
           value: "latest"
     - name: code-cis-scan-status-finished
       runAfter:
-        - gitsecure-cis-check
+        - cra-cis-check
       taskRef:
         name: git-set-commit-status
       workspaces:
@@ -216,7 +216,7 @@ spec:
           workspace: pipeline-ws
       params:
         - name: state
-          value: "$(tasks.gitsecure-cis-check.results.status)"
+          value: "$(tasks.cra-cis-check.results.status)"
         - name: description
           value: "Tekton PR Pipeline Status"
         - name: pipeline-debug
@@ -244,11 +244,11 @@ spec:
           value: "BOM check"
         - name: repository
           value: $(tasks.extract-repository-url.results.extracted-value)
-    - name: gitsecure-bom
+    - name: cra-bom
       taskRef:
-        name: gitsecure-bom
+        name: cra-bom
       runAfter:
-        - gitsecure-discovery-scan
+        - cra-discovery-scan
       workspaces:
         - name: artifacts
           workspace: pipeline-ws
@@ -275,7 +275,7 @@ spec:
           value: "latest"
     - name: code-bom-check-status-finished
       runAfter:
-        - gitsecure-bom
+        - cra-bom
       taskRef:
         name: git-set-commit-status
       workspaces:
@@ -283,7 +283,7 @@ spec:
           workspace: pipeline-ws
       params:
         - name: state
-          value: "$(tasks.gitsecure-bom.results.status)"
+          value: "$(tasks.cra-bom.results.status)"
         - name: description
           value: "Tekton PR Pipeline Status"
         - name: pipeline-debug
