@@ -139,8 +139,6 @@ spec:
           value: git-token
         - name: ibmcloud-api-key
           value: $(params.apikey)
-        - name: commeditor-tag
-          value: "latest"
     - name: code-vulnerability-scan-status-finished
       runAfter:
         - code-vulnerability-scan
@@ -204,8 +202,6 @@ spec:
           value: $(params.apikey)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: commeditor-tag
-          value: "latest"
     - name: code-cis-scan-status-finished
       runAfter:
         - cra-cis-check
@@ -271,8 +267,6 @@ spec:
           value: $(params.apikey)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: commeditor-tag
-          value: "latest"
     - name: code-bom-check-status-finished
       runAfter:
         - cra-bom

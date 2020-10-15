@@ -193,8 +193,6 @@ spec:
           value: git-token
         - name: ibmcloud-api-key
           value: $(params.apikey)
-        - name: commeditor-tag
-          value: "latest"
 
     - name: cra-cis-check
       taskRef:
@@ -221,8 +219,6 @@ spec:
           value: $(params.apikey)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: commeditor-tag
-          value: "latest"
     - name: cra-bom
       taskRef:
         name: cra-bom
@@ -250,8 +246,6 @@ spec:
           value: $(params.apikey)
         - name: pipeline-debug
           value: $(params.pipeline-debug)
-        - name: commeditor-tag
-          value: "latest"
     - name: containerize
       runAfter: [unit-tests]
       taskRef:
