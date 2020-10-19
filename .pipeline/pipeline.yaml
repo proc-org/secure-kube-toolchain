@@ -242,8 +242,6 @@ spec:
           value: $(tasks.git-clone.results.git-commit)      
         - name: ibmcloud-api-key
           value: $(params.apikey)
-        - name: pipeline-debug
-          value: $(params.pipeline-debug)
     - name: containerize
       runAfter: [unit-tests]
       taskRef:
