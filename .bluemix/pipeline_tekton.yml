@@ -45,6 +45,7 @@ triggers:
     name: commit-push
     eventListener: ${GIT_COMMIT_EVENT_LISTENER_NAME}
     service: ${APP_REPO}
+    disabled: true
     branch: master
     events: { "push": true }
   - type: manual
